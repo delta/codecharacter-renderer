@@ -1,0 +1,6 @@
+From
+ 72b3f35 Added parsing changes to match change in game.proto
+
+
+DESCRIPTION
+Basic AI. 1 player is inactive. Other player builds a few towers.

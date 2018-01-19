@@ -1,0 +1,8 @@
+From
+ 9c1050d Change game.proto
+To
+ 9f37ccd Added method to update terrain ownership
+
+
+DESCRIPTION
+Soldiers move diagonally in a top left to bottom right fassion and respawn in their original positions after traversing some distance.

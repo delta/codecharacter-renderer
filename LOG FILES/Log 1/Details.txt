@@ -1,0 +1,10 @@
+From
+ 5c69c86 Add sample protofile and logfile
+To
+ c7f8163 Update game log fetch to Fetch API
+
+
+[Log file present in source]
+
+DESCRIPTION
+For decoding and processing purposes only.
