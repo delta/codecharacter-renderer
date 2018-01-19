@@ -1,50 +1,53 @@
-import * as PIXI from 'pixi.js';
+import StateObject from './stateobject';
+import GraphicsPrimitive from './graphicsprimitive';
 
-export default class TerrainElement {
-    constructor(x, y, type, texture) {
+export default class TerrainElement extends StateObject {
+    constructor(x, y, type) {
+        let texture = TerrainElement.getTexture(type);
+        super(x, y, TerrainElement.sideLength, TerrainElement.sideLength, texture);
+
+        this.playerID = 0;
         this.type = type;
-        this.sprite = new PIXI.Sprite(texture);
-        this.buildSprite(x, y);
+        this.overlay = new GraphicsPrimitive(x, y, TerrainElement.sideLength, TerrainElement.sideLength);
     }
 
-    buildSprite(x, y, width, height) {
-        this.sprite.width = TerrainElement.sideLength;
-        this.sprite.height = TerrainElement.sideLength;
-        this.updateSprite(x, y);
+    addOwnership(playerID) {
+        if (this.playerID == playerID || this.playerID == 3)
+            return;
+
+        if (this.playerID === 0)
+            this.playerID = playerID;
+        else this.playerID = 3;
+
+        this.overlay.fill(this.playerID);
     }
 
-    addSprite(stage) {
-        stage.addChild(this.sprite);
-    }
+    removeOwnership(playerID) {
+        if (this.playerID == 0 || (this.playerID != 3 && this.playerID != playerID))
+            return;
 
-    updateSprite(x, y) {
-        this.sprite.x = x;
-        this.sprite.y = y;
-    }
-
-    setPlayerID(id) {
-        this.playerID = id;
-        // this.sprite.texture = PIXI.loader.resources.newPlayerID.texture;
-    }
-
-    static build(stateTerrain, gameTerrain) {
-        const len = TerrainElement.sideLength;
-        var texture;
-
-        for (let i = 0; i < stateTerrain.length; i++) {
-            gameTerrain[i] = [];
-            for (let j = 0; j < stateTerrain[i].length; j++) {
-                if (stateTerrain[i][j] == 'l')
-                    texture = PIXI.loader.resources.land.texture;
-                else
-                    texture = PIXI.loader.resources.water.texture;
-
-                gameTerrain[i][j] = new TerrainElement(len*i, len*j, stateTerrain[i][j], texture);
-            }
-        }
+        this.playerID -= playerID;
+        this.overlay.fill(this.playerID);
     }
 
     static setSideLength(len) {
-        TerrainElement.sideLength = len;
+        this.sideLength = len;
+    }
+
+    static setTextures(textures) {
+        this.textures = textures;
+    }
+
+    static getTexture(type) {
+        switch (type) {
+        case 'l':
+            return this.textures.landTexture;
+        case 'w':
+            return this.textures.waterTexture;
+        }
+    }
+
+    static setOverlayOpacity(OVERLAY_CONSTANTS) {
+        GraphicsPrimitive.setOpacity(OVERLAY_CONSTANTS.opacity);
     }
 }

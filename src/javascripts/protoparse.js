@@ -1,5 +1,6 @@
 import * as PROTOBUF from 'protobufjs';
-import gameProtoFile from "../assets/game.proto";
+import gameProtoFile from "../proto/game.proto";
+import CONSTANTS from './constants';
 
 export default class Proto {
     constructor(logFile) {
@@ -23,8 +24,11 @@ export default class Proto {
     processRawObject(rawDetails) {
         let stateVariable = {
             soldierMaxHp: rawDetails.soldierMaxHp,
-            towerMaxHps: rawDetails.towerMaxHps.slice(),
-            towerRanges: rawDetails.towerRanges.slice(),
+            terrainElementSize: rawDetails.mapElementSize,
+            tower: {
+                maxHps: rawDetails.towerMaxHps.slice(),
+                ranges: rawDetails.towerRanges.slice()
+            },
             terrain: this.processTerrain(rawDetails.terrain.rows),
             states: this.processStates(rawDetails.states)
         };
@@ -40,14 +44,11 @@ export default class Proto {
 
             for (let element of row.elements) {
                 switch (element.type) {
-                case 0:
-                    processedRow.push(undefined);
-                    break;
                 case 1:
-                    processedRow.push('w');
-                    break;
-                case 2:
                     processedRow.push('l');
+                    break;
+                default:
+                    processedRow.push('w');
                     break;
                 }
             }
@@ -59,11 +60,13 @@ export default class Proto {
 
     processStates(decodedStates) {
         let processedStates = [];
-        let towerList = {};
+        let soldierList = {};
+        let towerList = {},
+            deadTowers = [];
         for (let frame of decodedStates) {
             let processedFrame = {
-                soldiers: this.processSoldiers(frame.soldiers),
-                towers: this.processTowers(towerList, frame.towers),
+                soldiers: this.processSoldiers(soldierList, frame.soldiers),
+                towers: this.processTowers(towerList, frame.towers, deadTowers),
                 money: frame.money.slice()
             };
 
@@ -73,8 +76,9 @@ export default class Proto {
         return processedStates;
     }
 
-    processSoldiers(soldiers) {
+    processSoldiers(soldierList, soldiers) {
         for (let i = 0; i < soldiers.length; i++) {
+            soldiers[i].stateHasChanged = false;
             if (!soldiers[i].hasOwnProperty('hp'))
                 soldiers[i].hp = 0;
             if (!soldiers[i].hasOwnProperty('x'))
@@ -84,15 +88,39 @@ export default class Proto {
             if (!soldiers[i].hasOwnProperty('state'))
                 soldiers[i].state = 0;
 
-            if (i < soldiers.length/2)
-                soldiers[i].playerId = 0;
-            else soldiers[i].playerId = 1;
+            soldiers[i].playerId = (i < soldiers.length/2) ? 0 : 1;
+
+            if (!soldierList.hasOwnProperty(i)) {
+                soldierList[i] = Object.assign({}, soldiers[i]);
+            } else {
+                if (soldierList[i].state != soldiers[i].state) {
+                    soldiers[i].stateHasChanged = true;
+                }
+            }
         }
 
         return soldiers;
     }
 
-    processTowers(towerList, towers) {
+    processTowers(towerList, towers, deadTowers) {
+        if (towers === undefined && deadTowers.length === 0) {
+            towerList.hasChanged = false;
+            return towerList;
+        }
+
+        towerList.hasChanged = true;
+
+        for (let i = 0; i < deadTowers.length; i++) {
+            let deadTower = towerList[deadTowers[i]];
+            if (deadTower.framesLeft >= 0) {
+                deadTower.framesLeft--;
+                deadTower.levelHasChanged = false;
+            } else {
+                deadTowers.splice(i, 1);
+                delete towerList[deadTower.id];
+            }
+        }
+
         for (let tower of towers) {
             if (!tower.hasOwnProperty('id'))
                 tower.id = 0;
@@ -101,23 +129,39 @@ export default class Proto {
 
             if (towerList.hasOwnProperty(tower.id)) {
                 if (tower.is_dead === true) {
-                    delete towerList[tower.id];         // Add methods to delete sprite
-                    continue;
+                    // Tower Destroyed
+                    towerList[tower.id].isDead = true;
+                    towerList[tower.id].levelHasChanged = true;
+                    towerList[tower.id].updateMethod = "destroy";
+                    towerList[tower.id].framesLeft = CONSTANTS.towers.maxDeathFrames;
+
+                    deadTowers.push(tower.id);
                 } else {
-                    for (let property in tower) {
-                        towerList[tower.id][property] = tower[property];
-                    }
+                    // Tower level and/or HP have changed
+                    towerList[tower.id].levelHasChanged =
+                        (towerList[tower.id].towerLevel == tower.towerLevel) ? false : true;
+
+                    // for (let property in tower) {
+                    //     towerList[tower.id][property] = tower[property];
+                    // }
+                    towerList[tower.id].hp = tower.hp;
+                    towerList[tower.id].towerLevel = tower.towerLevel;
+
+                    towerList[tower.id].updateMethod = "update";
                 }
             } else {
+                // New Tower
                 if (!tower.hasOwnProperty('x'))
                     tower.x = 0;
                 if (!tower.hasOwnProperty('y'))
                     tower.y = 0;
 
-                towerList[tower.id] = JSON.parse(JSON.stringify(tower));
+                tower.levelHasChanged = true;
+                tower.updateMethod = "create";
+                towerList[tower.id] = Object.assign({}, tower);
             }
         }
 
-        return towerList;
+        return JSON.parse(JSON.stringify(towerList));
     }
 }
