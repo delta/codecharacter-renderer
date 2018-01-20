@@ -1,5 +1,7 @@
 From
  006f8d4 Optimize game method 'towerUpdate'
+To
+ f8a1a00 Render sprites with pivot on the bottom center point
 
 
 DESCRIPTION
