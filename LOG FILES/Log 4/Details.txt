@@ -1,0 +1,7 @@
+From
+ 006f8d4 Optimize game method 'towerUpdate'
+
+
+DESCRIPTION
+Basic AI. Both players attack each other. Towers get created and destroyed.
+(In first commit alone, terrain ownership update doesn't function as it should)

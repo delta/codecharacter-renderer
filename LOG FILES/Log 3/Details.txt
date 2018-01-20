@@ -1,5 +1,7 @@
 From
  72b3f35 Added parsing changes to match change in game.proto
+To
+ 1814a1c Add temp sprites for Soldiers and Towers
 
 
 DESCRIPTION
