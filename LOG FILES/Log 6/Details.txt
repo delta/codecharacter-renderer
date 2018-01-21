@@ -1,0 +1,5 @@
+From
+ aa0e733 Fix faulty towerProcess method
+
+DESCRIPTION
+More active AIs. Both players build a lotta inefficient towers.

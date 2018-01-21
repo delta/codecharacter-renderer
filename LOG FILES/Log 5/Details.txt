@@ -1,5 +1,7 @@
 From
  43794d7 Add changes to match change in game.proto
+To
+ 4bab947 Modify Game to allow for chainable method calls
 
 
 DESCRIPTION
