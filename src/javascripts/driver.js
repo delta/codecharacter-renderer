@@ -6,6 +6,10 @@ import soldierP1Asset from "../assets/soldierP1.png";
 import soldierP2Asset from "../assets/soldierP2.png";
 import towerP1Asset from "../assets/towerP1.png";
 import towerP2Asset from "../assets/towerP2.png";
+import terrainAsset from "../assets/terrain.jpeg";
+import terrainP1Asset from "../assets/terrainP1.jpeg";
+import terrainP2Asset from "../assets/terrainP2.jpeg";
+import terrainBothAsset from "../assets/terrain-both.jpeg";
 
 var game;
 
@@ -16,6 +20,10 @@ export function initRenderer(callback) {
         .add("soldierP2Sheet", soldierP2Asset)
         .add("towerP1", towerP1Asset)
         .add("towerP2", towerP2Asset)
+        .add("terrain", terrainAsset)
+        .add("terrainP1", terrainP1Asset)
+        .add("terrainP2", terrainP2Asset)
+        .add("terrainBoth", terrainBothAsset)
         .load(callback);
 }
 

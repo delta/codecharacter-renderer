@@ -4,7 +4,7 @@ import GraphicsPrimitive from './graphicsprimitive';
 
 export default class TerrainElement extends StateObject {
     constructor(x, y) {
-        super(x, y, TerrainElement.sideLength, TerrainElement.sideLength, TerrainElement.textures.landTexture);
+        super(x, y, TerrainElement.sideLength, TerrainElement.sideLength, TerrainElement.textures.standardTexture);
 
         this.playerID = 0;
         this.nearbyTowers = { 1: {}, 2: {} };
@@ -23,7 +23,9 @@ export default class TerrainElement extends StateObject {
         else this.playerID = 3;
 
         TerrainElement.addOwnership(playerID);
-        this.overlay.fill(this.playerID);
+        // this.overlay.fill(this.playerID);
+        let spriteDetails = TerrainElement.getSpriteDetails(this.playerID);
+        this.sprite.texture = spriteDetails.texture;
     }
 
     removeOwnership(playerID, towerID) {
@@ -35,7 +37,9 @@ export default class TerrainElement extends StateObject {
         if ( Object.keys(this.getNearbyTowers(playerID)).length === 0 ) {
             TerrainElement.removeOwnership(playerID);
             this.playerID -= playerID;
-            this.overlay.fill(this.playerID);
+            // this.overlay.fill(this.playerID);
+            let spriteDetails = TerrainElement.getSpriteDetails(this.playerID);
+            this.sprite.texture = spriteDetails.texture;
         }
     }
 
@@ -77,8 +81,32 @@ export default class TerrainElement extends StateObject {
 
     static setTextures() {
         this.textures = {
-            landTexture: PIXI.loader.resources.land.texture
+            standardTexture: PIXI.loader.resources.terrain.texture,
+            p1Texture: PIXI.loader.resources.terrainP1.texture,
+            p2Texture: PIXI.loader.resources.terrainP2.texture,
+            sharedTexture: PIXI.loader.resources.terrainBoth.texture
         };
+    }
+
+    static getSpriteDetails(playerID) {
+        let details = {texture: null};
+
+        switch(playerID) {
+        case 0:
+            details.texture = this.textures.standardTexture;
+            break;
+        case 1:
+            details.texture = this.textures.p1Texture;
+            break;
+        case 2:
+            details.texture = this.textures.p2Texture;
+            break;
+        case 3:
+            details.texture = this.textures.sharedTexture;
+            break;
+        }
+
+        return details;
     }
 
     static setOverlayConstants(OVERLAY_CONSTANTS) {
