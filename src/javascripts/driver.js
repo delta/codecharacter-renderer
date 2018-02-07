@@ -6,10 +6,10 @@ import soldierP1Asset from "../assets/soldierP1.png";
 import soldierP2Asset from "../assets/soldierP2.png";
 import towerP1Asset from "../assets/towerP1.png";
 import towerP2Asset from "../assets/towerP2.png";
-import terrainAsset from "../assets/terrain.jpeg";
-import terrainP1Asset from "../assets/terrainP1.jpeg";
-import terrainP2Asset from "../assets/terrainP2.jpeg";
-import terrainBothAsset from "../assets/terrain-both.jpeg";
+import terrainAsset from "../assets/terrain.png";
+import terrainP1Asset from "../assets/terrainP1.png";
+import terrainP2Asset from "../assets/terrainP2.png";
+import terrainBothAsset from "../assets/terrain-both.png";
 
 var game;
 
