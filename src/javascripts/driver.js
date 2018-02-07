@@ -1,7 +1,6 @@
 import * as PIXI from 'pixi.js';
 import Game from './game';
 import Proto from './protoparse.js';
-import landAsset from "../assets/land.jpg";
 import soldierP1Asset from "../assets/soldierP1.png";
 import soldierP2Asset from "../assets/soldierP2.png";
 import towerP1Asset from "../assets/towerP1.png";
@@ -15,7 +14,6 @@ var game;
 
 export function initRenderer(callback) {
     PIXI.loader
-        .add("land", landAsset)
         .add("soldierP1Sheet", soldierP1Asset)
         .add("soldierP2Sheet", soldierP2Asset)
         .add("towerP1", towerP1Asset)
